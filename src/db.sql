@@ -11,10 +11,10 @@ CREATE TABLE access_points (
 
 CREATE TABLE survey_contexts (
     id          serial PRIMARY KEY,
-    plan        varchar(50),
+    floor_plan  varchar(50),
     user_name   varchar(50),
     survey_name varchar(50),
-    UNIQUE (plan, user_name, survey_name)
+    UNIQUE (floor_plan, user_name, survey_name)
 );
 
 CREATE TABLE measurements (
@@ -29,7 +29,7 @@ CREATE TABLE measurements (
 CREATE INDEX ON measurements (survey_context);
 
 CREATE VIEW survey_data AS
-    SELECT measurements.id, coordinate, log_time, plan, user_name, survey_name, mac, channel, ssid, readings
+    SELECT measurements.id, coordinate, log_time, floor_plan, user_name, survey_name, mac, channel, ssid, readings
     FROM measurements, survey_contexts, access_points
     WHERE measurements.survey_context = survey_contexts.id AND measurements.ap_info = access_points.id;
 
@@ -52,11 +52,11 @@ BEGIN
 
     SELECT id INTO context_id
     FROM survey_contexts
-    WHERE plan = NEW.plan AND user_name = NEW.user_name AND survey_name = NEW.survey_name;
+    WHERE floor_plan = NEW.floor_plan AND user_name = NEW.user_name AND survey_name = NEW.survey_name;
     IF NOT FOUND
     THEN
-        INSERT INTO survey_contexts (plan, user_name, survey_name)
-        VALUES (NEW.plan, NEW.user_name, NEW.survey_name)
+        INSERT INTO survey_contexts (floor_plan, user_name, survey_name)
+        VALUES (NEW.floor_plan, NEW.user_name, NEW.survey_name)
         RETURNING id INTO context_id;
     END IF;
 
@@ -86,7 +86,7 @@ INSTEAD OF DELETE ON survey_data
 FOR EACH ROW
 EXECUTE PROCEDURE survey_data_delete_row();
 
-INSERT INTO survey_data (coordinate, log_time, plan, user_name, survey_name, mac, channel, ssid, readings)
+INSERT INTO survey_data (coordinate, log_time, floor_plan, user_name, survey_name, mac, channel, ssid, readings)
 VALUES (point(0.12, 0.15), '2017-03-12 13:56:42.75', 'floor-8', 'group-2', 'exp#1', macaddr('00-14-22-01-23-45'), 6,
         'CE_WLAN', '{-25.5}');
 

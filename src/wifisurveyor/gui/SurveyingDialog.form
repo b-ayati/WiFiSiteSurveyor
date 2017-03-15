@@ -45,7 +45,7 @@
             </constraints>
             <properties>
               <labelFor value=""/>
-              <text value="Label"/>
+              <text value="• ready"/>
             </properties>
           </component>
         </children>

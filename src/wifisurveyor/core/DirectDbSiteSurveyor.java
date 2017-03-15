@@ -1,5 +1,6 @@
 package wifisurveyor.core;
 
+import wifisurveyor.Manager;
 import wifisurveyor.PlainTextTable;
 import wifisurveyor.WifiSiteSurveyor;
 
@@ -87,14 +88,18 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     @Override
     public void remove(Point2D location)
     {
+        Manager.getUI().reportStatus("removing point...");
         delay();
+        Manager.getUI().reportStatus(null);
     }
 
 
     @Override
     public PlainTextTable getData(Point2D location)
     {
+        Manager.getUI().reportStatus("reading point data...");
         delay();
+        Manager.getUI().reportStatus("data fetched.");
         return new PlainTextTable();
     }
 

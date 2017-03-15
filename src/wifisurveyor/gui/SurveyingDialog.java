@@ -22,6 +22,7 @@ public class SurveyingDialog extends JDialog
     {
         setContentPane(contentPane);
         setModal(true);
+        ((GUI) Manager.getUI()).setCurrSurveyingDialog(this);
         closeButton.addActionListener(e -> dispose());
     }
 
@@ -33,4 +34,11 @@ public class SurveyingDialog extends JDialog
                 Manager.getSurveyor().getCurrentFloorPlanImg(),
                 Manager.getSurveyor().getCurrentPoints());
     }
+
+    public void showStatus(String status)
+    {
+        //statusLabel.setIcon(new ImageIcon(getClass().getResource("resources/icons/green.gif")));
+        statusLabel.setText("• " + status);
+    }
+
 }
