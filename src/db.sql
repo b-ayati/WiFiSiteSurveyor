@@ -90,3 +90,6 @@ INSERT INTO survey_data (coordinate, log_time, floor_plan, user_name, survey_nam
 VALUES (point(0.12, 0.15), '2017-03-12 13:56:42.75', 'floor-8', 'group-2', 'exp#1', macaddr('00-14-22-01-23-45'), 6,
         'CE_WLAN', '{-25.5}');
 
+
+SELECT * FROM survey_data WHERE coordinate <-> POINT(0.22130,0.1378881) <= 0.0001
+

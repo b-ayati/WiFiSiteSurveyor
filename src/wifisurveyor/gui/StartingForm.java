@@ -1,17 +1,9 @@
 package wifisurveyor.gui;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
 import wifisurveyor.Manager;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Created by Behrouz on 13/03/2017.
@@ -21,7 +13,7 @@ public class StartingForm
     JPanel rootPanel;
     private JButton okButton;
     private JComboBox planComboBox;
-    private JComboBox surveyNameComboBox;
+    private JComboBox prjNameComboBox;
 
 
     public StartingForm()
@@ -31,20 +23,29 @@ public class StartingForm
 
     private void onStart()
     {
-        Manager.getSurveyor().setContext((String) planComboBox.getSelectedItem(), (String) surveyNameComboBox.getSelectedItem());
-        SurveyingDialog dialog = new SurveyingDialog();
-        dialog.pack();
-        dialog.setTitle("asdsads");
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        String floor_plan = (String) planComboBox.getSelectedItem();
+        String prj = (String) prjNameComboBox.getSelectedItem();
+        if(prj.equals(""))
+            JOptionPane.showMessageDialog(null, "please enter a valid name for your project.");
+        else
+        {
+            Manager.getSurveyor().setContext(floor_plan, prj);
+            SurveyingDialog dialog = new SurveyingDialog();
+            dialog.pack();
+            dialog.setTitle(prj + ": " + floor_plan);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if(prjNameComboBox.getSelectedIndex() == -1)        //an ugly way to keep the combo box updated!
+                prjNameComboBox.addItem(prj);
+        }
     }
 
     private void createUIComponents()
     {
         planComboBox = new JComboBox(Manager.getSurveyor().getFloorPlanNames());
-        surveyNameComboBox = new JComboBox(Manager.getSurveyor().getSurveyNames());
+        prjNameComboBox = new JComboBox(Manager.getSurveyor().getSurveyNames());
         planComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
-        surveyNameComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
+        prjNameComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
     }
 
     public static void createAndShow()

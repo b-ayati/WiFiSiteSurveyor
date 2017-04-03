@@ -62,7 +62,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         table.setEnabled(false);
         JScrollPane scrollPane = new JScrollPane(table);
         table.setFillsViewportHeight(true);
-        JOptionPane.showMessageDialog(parent, scrollPane, "Data", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(parent, scrollPane, String.format("Data saved at [%3f,%3f]", p.getX(), p.getY()) , JOptionPane.PLAIN_MESSAGE);
         return true;
     }
 }
