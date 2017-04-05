@@ -1,6 +1,5 @@
 package wifisurveyor.gui;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
 import wifisurveyor.Manager;
 
 import javax.swing.*;
@@ -32,6 +31,7 @@ public class StartingForm
         {
             Manager.getSurveyor().setContext(floor_plan, prj);
             SurveyingDialog dialog = new SurveyingDialog();
+
             dialog.pack();
             dialog.setTitle(prj + ": " + floor_plan);
             dialog.setLocationRelativeTo(null);
@@ -41,11 +41,20 @@ public class StartingForm
         }
     }
 
-    private void createUIComponents() throws SQLException {
-        planComboBox = new JComboBox(Manager.getSurveyor().getFloorPlanNames());
-        prjNameComboBox = new JComboBox(Manager.getSurveyor().getSurveyNames());
-        planComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
-        prjNameComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
+    private void createUIComponents()
+    {
+        try
+        {
+            planComboBox = new JComboBox(Manager.getSurveyor().getFloorPlanNames());
+
+            prjNameComboBox = new JComboBox(Manager.getSurveyor().getSurveyNames());
+            planComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
+            prjNameComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
+        }
+        catch (Exception e)
+        {
+            GUI.showFatalErrorMessage(null, e);
+        }
     }
 
     public static void createAndShow()

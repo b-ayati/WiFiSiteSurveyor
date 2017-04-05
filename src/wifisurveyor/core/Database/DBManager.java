@@ -1,8 +1,5 @@
 package wifisurveyor.core.Database;
 
-import org.postgresql.geometric.PGpoint;
-
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.sql.*;
 import java.util.ArrayList;
@@ -24,8 +21,7 @@ public class DBManager {
     public DBManager() throws SQLException, ClassNotFoundException {
         System.out.println("connecting to database ....");
         Class.forName("org.postgresql.Driver");
-        this.c = DriverManager
-                .getConnection("jdbc:postgresql://git.ce.sharif.edu:5432/site_survey_db", user,password);
+        this.c = DriverManager.getConnection("jdbc:postgresql://git.ce.sharif.edu:5432/site_survey_db", user, password);
         this.c.setAutoCommit(false);
         this.stmt = c.createStatement();
         System.out.println("finished ....");
@@ -65,7 +61,7 @@ public class DBManager {
     }
     public Point2D[] getPoints(String floor_plan,String username, String survey_name) throws SQLException {
 
-        String query = String .format("SELECT coordinate from survey_data WHERE floor_plan = '%s' and user_name = '%s' and survey_name='%s';", floor_plan, username, survey_name);
+        String query = String.format("SELECT coordinate from survey_data WHERE floor_plan = '%s' and user_name = '%s' and survey_name='%s';", floor_plan, username, survey_name);
         ResultSet resultSet = stmt.executeQuery(query);
         ArrayList<Point2D> point2DS = new ArrayList<>();
         while (resultSet.next()){

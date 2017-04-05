@@ -1,16 +1,13 @@
 package wifisurveyor;
 
-import wifisurveyor.core.DirectDbSiteSurveyor;
-import wifisurveyor.gui.GUI;
-
 /**
  * Created by Behrouz on 14/03/2017.
  */
 public class Manager
 {
-    private static WifiSiteSurveyor wifiSiteSurveyorInstance = new DirectDbSiteSurveyor();
+    private static WifiSiteSurveyor wifiSiteSurveyorInstance = null;
 
-    private static UI uiInstance = new GUI();
+    private static UI uiInstance = null;
 
     public static WifiSiteSurveyor getSurveyor()
     {
@@ -22,9 +19,17 @@ public class Manager
         return uiInstance;
     }
 
+    public static void initialize(WifiSiteSurveyor surveyor, UI ui)
+    {
+        if (uiInstance == null && wifiSiteSurveyorInstance == null)
+        {
+            wifiSiteSurveyorInstance = surveyor;
+            uiInstance = ui;
+        } else
+            throw new IllegalStateException("manager's been initialized already.");
+    }
+
     private Manager()
     {
     }
-
-
 }

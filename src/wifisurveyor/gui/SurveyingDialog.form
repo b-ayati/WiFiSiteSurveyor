@@ -45,7 +45,7 @@
             </constraints>
             <properties>
               <labelFor value=""/>
-              <text value="• ready"/>
+              <text value="• Surveyor started."/>
             </properties>
           </component>
         </children>

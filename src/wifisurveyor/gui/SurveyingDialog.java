@@ -2,15 +2,8 @@ package wifisurveyor.gui;
 
 import wifisurveyor.Manager;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
+import java.awt.*;
 
 public class SurveyingDialog extends JDialog
 {
@@ -23,22 +16,21 @@ public class SurveyingDialog extends JDialog
     {
         setContentPane(contentPane);
         setModal(true);
+        int height = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.85, this.getPreferredSize().getHeight());
+        int width = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getWidth() * 0.85, this.getPreferredSize().getWidth());
+        setPreferredSize(new Dimension(width, height));
         ((GUI) Manager.getUI()).setCurrSurveyingDialog(this);
         closeButton.addActionListener(e -> dispose());
     }
 
     private void createUIComponents()
     {
-        try {
-            imprintableImg = new ImprintableImage(
-                    new ImprintableImage.Configuration(),
-                    new FloorPlanSurveyor(),
-                    Manager.getSurveyor().getCurrentFloorPlanImg(),
-                    Manager.getSurveyor().getCurrentPoints());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        imprintableImg = new ImprintableImage(
+                new ImprintableImage.Configuration(),
+                new FloorPlanSurveyor(),
+                Manager.getSurveyor().getCurrentFloorPlanImg());
     }
+
 
     public void showStatus(String status)
     {

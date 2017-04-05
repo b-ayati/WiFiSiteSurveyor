@@ -5,12 +5,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static javax.swing.SwingUtilities.*;
+import static javax.swing.SwingUtilities.isLeftMouseButton;
+import static javax.swing.SwingUtilities.isRightMouseButton;
 
 /**
  * Created by ayati on 3/5/2017.
@@ -23,18 +23,20 @@ public class ImprintableImage extends JComponent implements MouseListener
 
         boolean addPoint(Point2D p);
 
-        boolean removePoint(Point2D p) throws SQLException;
+        boolean removePoint(Point2D p);
 
-        boolean selectPoint(Point2D p) throws SQLException;
+        boolean selectPoint(Point2D p);
+
+        Point2D[] getInitialPoints();
     }
 
     public static class Configuration
     {
         private final double distancePrecision = 0.015;
         private final ImageIcon pointAddedIcon = new ImageIcon(getClass().getResource("resources/icons/checked.png"));
-        private final ImageIcon pointSavingIcon  = new ImageIcon(getClass().getResource("resources/icons/ripple.gif"));
-        private final ImageIcon pointRemovingIcon  = new ImageIcon(getClass().getResource("resources/icons/default.gif"));
-        private final ImageIcon pointSelectedIcon  = new ImageIcon(getClass().getResource("resources/icons/magnify.gif"));
+        private final ImageIcon pointSavingIcon = new ImageIcon(getClass().getResource("resources/icons/ripple.gif"));
+        private final ImageIcon pointRemovingIcon = new ImageIcon(getClass().getResource("resources/icons/default.gif"));
+        private final ImageIcon pointSelectedIcon = new ImageIcon(getClass().getResource("resources/icons/magnify.gif"));
     }
 
     private class Point
@@ -98,13 +100,14 @@ public class ImprintableImage extends JComponent implements MouseListener
     private List<ImprintableImage.Point> markedPoints = Collections.synchronizedList(new ArrayList<>());
     private boolean isReady = true;
 
-    public ImprintableImage(Configuration config, Handler handler, Image backgroundImage, Point2D[] initialPoints)
+    public ImprintableImage(Configuration config, Handler handler, Image backgroundImage)
     {
         this.handler = handler;
         handler.setParent(this);
         this.backgroundImage = backgroundImage;
         addMouseListener(this);
         this.config = config;
+        Point2D[] initialPoints = handler.getInitialPoints();
         for (Point2D initPt : initialPoints)
         {
             Point tempPt = new Point((float) initPt.getX(), (float) initPt.getY());
@@ -131,7 +134,7 @@ public class ImprintableImage extends JComponent implements MouseListener
         if (isReady && p.isInside())
         {
             isReady = false;
-             int index = markedPoints.lastIndexOf(p);
+            int index = markedPoints.lastIndexOf(p);
             if (index == -1)
             {
                 if (isLeftMouseButton(e))
@@ -146,11 +149,9 @@ public class ImprintableImage extends JComponent implements MouseListener
                             markedPoints.remove(markedPoints.size() - 1);
                         isReady = true;
                     }).start();
-                }
-                else
+                } else
                     isReady = true;
-            }
-            else
+            } else
             {
                 Point selected = markedPoints.get(index);
                 if (isRightMouseButton(e))
@@ -158,27 +159,18 @@ public class ImprintableImage extends JComponent implements MouseListener
                     selected.setIcon(config.pointRemovingIcon);
                     new Thread(() ->
                     {
-                        try {
-                            if (handler.removePoint(p.normalizedPoint))
-                                markedPoints.remove(index);
-                            else
-                                selected.setIcon(config.pointAddedIcon);
-                        } catch (SQLException e1) {
-                            e1.printStackTrace();
-                        }
+                        if (handler.removePoint(p.normalizedPoint))
+                            markedPoints.remove(index);
+                        else
+                            selected.setIcon(config.pointAddedIcon);
                         isReady = true;
                     }).start();
-                }
-                else
+                } else
                 {
                     selected.setIcon(config.pointSelectedIcon);
                     new Thread(() ->
                     {
-                        try {
-                            handler.selectPoint(p.normalizedPoint);
-                        } catch (SQLException e1) {
-                            e1.printStackTrace();
-                        }
+                        handler.selectPoint(p.normalizedPoint);
                         selected.setIcon(config.pointAddedIcon);
                         isReady = true;
                     }).start();

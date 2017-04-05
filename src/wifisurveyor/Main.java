@@ -1,6 +1,7 @@
 package wifisurveyor;
 
-import wifisurveyor.gui.StartingForm;
+import wifisurveyor.core.DirectDbSiteSurveyor;
+import wifisurveyor.gui.GUI;
 
 import javax.swing.*;
 
@@ -11,15 +12,21 @@ public class Main
 {
     public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException
     {
-
         // Set cross-platform Java L&F (also called "Metal")
         //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
         //Set System L&F
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        GUI ui = new GUI();
+        try
+        {
+            Manager.initialize(new DirectDbSiteSurveyor(), ui);
+        }
+        catch (Exception e)
+        {
+            GUI.showFatalErrorMessage(null, e);
+        }
+        ui.showMainForm();
 
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(StartingForm::createAndShow);
     }
 }
