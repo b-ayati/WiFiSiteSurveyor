@@ -5,6 +5,7 @@ import wifisurveyor.Manager;
 
 import javax.swing.*;
 
+
 /**
  * Created by Behrouz on 13/03/2017.
  */
@@ -40,8 +41,7 @@ public class StartingForm
         }
     }
 
-    private void createUIComponents()
-    {
+    private void createUIComponents() throws SQLException {
         planComboBox = new JComboBox(Manager.getSurveyor().getFloorPlanNames());
         prjNameComboBox = new JComboBox(Manager.getSurveyor().getSurveyNames());
         planComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");

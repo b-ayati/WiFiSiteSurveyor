@@ -9,6 +9,7 @@ import wifisurveyor.gui.GUI;
 public class Manager
 {
     private static WifiSiteSurveyor wifiSiteSurveyorInstance = new DirectDbSiteSurveyor();
+
     private static UI uiInstance = new GUI();
 
     public static WifiSiteSurveyor getSurveyor()

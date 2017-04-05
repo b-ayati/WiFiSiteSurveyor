@@ -5,31 +5,27 @@ package wifisurveyor;
  */
 public class PlainTextTable
 {
+    private String[] tableColumn;
+    private String[][] tableData;
+
+    public PlainTextTable(String[] tableColumn, String[][] tableData) {
+        this.tableColumn = tableColumn;
+        this.tableData = tableData;
+    }
+    public PlainTextTable(){
+        this.tableColumn = new String[0];
+        this.tableData = new String[0][0];
+    }
     /**
      *
      * @return table's data in Jtable format: table[row][column]
      */
     public String[][] getData()
     {
-        String [][] data = {
-                {"Kathy", "Smith",
-                        "Snowboarding"},
-                {"John", "Doe",
-                        "Rowing"},
-                {"Sue", "Black",
-                        "Knitting"},
-                {"Jane", "White",
-                        "Speed reading"},
-                {"Joe", "Brown",
-                        "Pool"}
-        };
-        return data;
+        return tableData;
     }
     public String[] getColumnNames()
     {
-        String[] columnNames = {"First Name",
-                "Last Name",
-                "Sport"};
-        return columnNames;
+        return tableColumn;
     }
 }

@@ -5,6 +5,7 @@ import wifisurveyor.PlainTextTable;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
+import java.sql.SQLException;
 
 /**
  * Created by ayati on 3/7/2017.
@@ -34,8 +35,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
     }
 
     @Override
-    public boolean removePoint(Point2D p)
-    {
+    public boolean removePoint(Point2D p) throws SQLException {
         int option = JOptionPane.showOptionDialog(
                 parent,
                 "Are you sure you want to permanently delete this point?",
@@ -55,8 +55,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
     }
 
     @Override
-    public boolean selectPoint(Point2D p)
-    {
+    public boolean selectPoint(Point2D p) throws SQLException {
         PlainTextTable textTable = Manager.getSurveyor().getData(p);
         JTable table = new JTable(textTable.getData(), textTable.getColumnNames());
         table.setEnabled(false);

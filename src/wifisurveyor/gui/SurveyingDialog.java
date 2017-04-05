@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class SurveyingDialog extends JDialog
 {
@@ -28,11 +29,15 @@ public class SurveyingDialog extends JDialog
 
     private void createUIComponents()
     {
-        imprintableImg = new ImprintableImage(
-                new ImprintableImage.Configuration(),
-                new FloorPlanSurveyor(),
-                Manager.getSurveyor().getCurrentFloorPlanImg(),
-                Manager.getSurveyor().getCurrentPoints());
+        try {
+            imprintableImg = new ImprintableImage(
+                    new ImprintableImage.Configuration(),
+                    new FloorPlanSurveyor(),
+                    Manager.getSurveyor().getCurrentFloorPlanImg(),
+                    Manager.getSurveyor().getCurrentPoints());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void showStatus(String status)
