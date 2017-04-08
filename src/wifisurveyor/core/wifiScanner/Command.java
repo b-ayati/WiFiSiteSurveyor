@@ -9,40 +9,30 @@ import java.io.InputStreamReader;
  */
 public class Command
 {
-    public static String executeString  ommand)
-
-
-
+    public static String execute(String command)
+    {
         try
         {
             StringBuilder stringBuilder = new StringBuilder();
-
-            r builder = ne  Proces B ild r("cmd.exe", "/c", command);
+            ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
             builder.redirectErrorStream(true);
             Process p = builder.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
-
-            ine =  .read
-            ll)
+            while ((line = r.readLine()) != null)
             {
                 stringBuilder.append(line);
                 stringBuilder.append("\n");
             }
             return stringBuilder.toString();
         }
-        cat
-        e
-        tion  )
+        catch (IOException e)
         {
             return null;
         }
     }
 
-
-
-    c stat c Stri g mock )
-
+    public static String mock()
     {
         return "Wireless System Information Summary\n" +
                 "(Time: 3/6/2017 9:33:05 AM Iran Standard Time)\n" +
