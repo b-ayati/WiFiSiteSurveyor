@@ -4,6 +4,7 @@ import wifisurveyor.core.DirectDbSiteSurveyor;
 import wifisurveyor.gui.GUI;
 
 import javax.swing.*;
+import java.sql.SQLException;
 
 /**
  * Created by ayati on 3/5/2017.
@@ -20,13 +21,13 @@ public class Main
         GUI ui = new GUI();
         try
         {
-            Manager.initialize(new DirectDbSiteSurveyor(), ui);
+            DirectDbSiteSurveyor surveyor = new DirectDbSiteSurveyor();
+            Manager.initialize(surveyor, ui);
+            ui.showMainForm();
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
-            GUI.showFatalErrorMessage(null, e);
+            ui.showConnectionErrorMessage(e);
         }
-        ui.showMainForm();
-
     }
 }

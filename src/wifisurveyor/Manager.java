@@ -25,8 +25,9 @@ public class Manager
         {
             wifiSiteSurveyorInstance = surveyor;
             uiInstance = ui;
-        } else
-            throw new IllegalStateException("manager's been initialized already.");
+        }
+        else
+            throw new IllegalStateException("manager already has been initialized.");
     }
 
     private Manager()

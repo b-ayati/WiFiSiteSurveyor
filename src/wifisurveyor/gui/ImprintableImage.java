@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static javax.swing.SwingUtilities.isLeftMouseButton;
@@ -97,7 +96,7 @@ public class ImprintableImage extends JComponent implements MouseListener
     private Configuration config;
     private Handler handler;
     private Image backgroundImage;
-    private List<ImprintableImage.Point> markedPoints = Collections.synchronizedList(new ArrayList<>());
+    private List<ImprintableImage.Point> markedPoints = new ArrayList<>();
     private boolean isReady = true;
 
     public ImprintableImage(Configuration config, Handler handler, Image backgroundImage)
@@ -128,7 +127,7 @@ public class ImprintableImage extends JComponent implements MouseListener
     }
 
     @Override
-    public void mouseClicked(MouseEvent e)
+    public synchronized void mouseClicked(MouseEvent e)
     {
         ImprintableImage.Point p = new ImprintableImage.Point(e.getX(), e.getY());
         if (isReady && p.isInside())
@@ -149,9 +148,11 @@ public class ImprintableImage extends JComponent implements MouseListener
                             markedPoints.remove(markedPoints.size() - 1);
                         isReady = true;
                     }).start();
-                } else
+                }
+                else
                     isReady = true;
-            } else
+            }
+            else
             {
                 Point selected = markedPoints.get(index);
                 if (isRightMouseButton(e))
@@ -159,18 +160,19 @@ public class ImprintableImage extends JComponent implements MouseListener
                     selected.setIcon(config.pointRemovingIcon);
                     new Thread(() ->
                     {
-                        if (handler.removePoint(p.normalizedPoint))
+                        if (handler.removePoint(selected.normalizedPoint))
                             markedPoints.remove(index);
                         else
                             selected.setIcon(config.pointAddedIcon);
                         isReady = true;
                     }).start();
-                } else
+                }
+                else
                 {
                     selected.setIcon(config.pointSelectedIcon);
                     new Thread(() ->
                     {
-                        handler.selectPoint(p.normalizedPoint);
+                        handler.selectPoint(selected.normalizedPoint);
                         selected.setIcon(config.pointAddedIcon);
                         isReady = true;
                     }).start();

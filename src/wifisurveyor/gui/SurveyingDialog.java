@@ -7,6 +7,7 @@ import java.awt.*;
 
 public class SurveyingDialog extends JDialog
 {
+    public static final double SCREEN_FILL = 0.9;
     private JPanel contentPane;
     private JButton closeButton;
     private ImprintableImage imprintableImg;
@@ -16,8 +17,8 @@ public class SurveyingDialog extends JDialog
     {
         setContentPane(contentPane);
         setModal(true);
-        int height = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.85, this.getPreferredSize().getHeight());
-        int width = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getWidth() * 0.85, this.getPreferredSize().getWidth());
+        int height = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight() * SCREEN_FILL, this.getPreferredSize().getHeight());
+        int width = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getWidth() * SCREEN_FILL, this.getPreferredSize().getWidth());
         setPreferredSize(new Dimension(width, height));
         ((GUI) Manager.getUI()).setCurrSurveyingDialog(this);
         closeButton.addActionListener(e -> dispose());
@@ -30,7 +31,6 @@ public class SurveyingDialog extends JDialog
                 new FloorPlanSurveyor(),
                 Manager.getSurveyor().getCurrentFloorPlanImg());
     }
-
 
     public void showStatus(String status)
     {

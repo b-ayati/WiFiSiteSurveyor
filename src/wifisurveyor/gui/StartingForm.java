@@ -25,7 +25,7 @@ public class StartingForm
     {
         String floor_plan = (String) planComboBox.getSelectedItem();
         String prj = (String) prjNameComboBox.getSelectedItem();
-        if(prj.equals(""))
+        if (prj.equals(""))
             JOptionPane.showMessageDialog(null, "please enter a valid name for your project.");
         else
         {
@@ -36,7 +36,7 @@ public class StartingForm
             dialog.setTitle(prj + ": " + floor_plan);
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-            if(prjNameComboBox.getSelectedIndex() == -1)        //an ugly way to keep the combo box updated!
+            if (prjNameComboBox.getSelectedIndex() == -1)        //an ugly way to keep the combo box updated!
                 prjNameComboBox.addItem(prj);
         }
     }
@@ -53,7 +53,7 @@ public class StartingForm
         }
         catch (Exception e)
         {
-            GUI.showFatalErrorMessage(null, e);
+            Manager.getUI().showFatalErrorMessage(e);
         }
     }
 

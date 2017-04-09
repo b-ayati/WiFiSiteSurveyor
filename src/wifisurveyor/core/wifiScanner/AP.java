@@ -3,8 +3,10 @@ package wifisurveyor.core.wifiScanner;
 /**
  * Created by hamid on 3/6/2017.
  */
-public class AP {
-    public AP(String ssid, String channel, String mac, float power) {
+public class AP
+{
+    public AP(String ssid, String channel, String mac, float power)
+    {
         this.ssid = ssid;
         this.channel = channel;
         this.mac = mac;

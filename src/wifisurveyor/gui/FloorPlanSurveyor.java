@@ -30,7 +30,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         }
         catch (Exception e)
         {
-            GUI.showErrorMessage(parent, e);
+            Manager.getUI().showGeneralErrorMessage(e);
             return false;
         }
     }
@@ -53,12 +53,13 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
             {
                 Manager.getSurveyor().remove(p);
                 return true;
-            } else
+            }
+            else
                 return false;
         }
         catch (Exception e)
         {
-            GUI.showErrorMessage(parent, e);
+            Manager.getUI().showGeneralErrorMessage(e);
             return false;
         }
     }
@@ -73,12 +74,12 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
             table.setEnabled(false);
             JScrollPane scrollPane = new JScrollPane(table);
             table.setFillsViewportHeight(true);
-            JOptionPane.showMessageDialog(parent, scrollPane, String.format("Data Collected at [%3f,%3f]", p.getX(), p.getY()), JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(parent, scrollPane, String.format("Data Collected at [%.3f,%.3f]", p.getX(), p.getY()), JOptionPane.PLAIN_MESSAGE);
             return true;
         }
         catch (Exception e)
         {
-            GUI.showErrorMessage(parent, e);
+            Manager.getUI().showGeneralErrorMessage(e);
             return false;
         }
     }
@@ -92,7 +93,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         }
         catch (Exception e)
         {
-            GUI.showErrorMessage(parent, e);
+            Manager.getUI().showGeneralErrorMessage(e);
             return null;
         }
     }

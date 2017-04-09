@@ -5,5 +5,11 @@ package wifisurveyor;
  */
 public interface UI
 {
-    public void reportStatus(String status);
+    void reportStatus(String status);
+
+    void showGeneralErrorMessage(Exception e);
+
+    void showConnectionErrorMessage(Exception e);
+
+    void showFatalErrorMessage(Exception e);
 }

@@ -2,28 +2,28 @@ DROP VIEW survey_data;
 DROP TABLE measurements, access_points, survey_contexts;
 
 CREATE TABLE access_points (
-    id      serial PRIMARY KEY,
-    mac     macaddr,
-    channel smallint CHECK (channel > 0 AND channel < 200),
-    ssid    varchar(100),
+    id      SERIAL PRIMARY KEY,
+    mac     MACADDR,
+    channel SMALLINT CHECK (channel > 0 AND channel < 200),
+    ssid    VARCHAR(100),
     UNIQUE (mac)
 );
 
 CREATE TABLE survey_contexts (
-    id          serial PRIMARY KEY,
-    floor_plan  varchar(50),
-    user_name   varchar(50),
-    survey_name varchar(50),
+    id          SERIAL PRIMARY KEY,
+    floor_plan  VARCHAR(50),
+    user_name   VARCHAR(50),
+    survey_name VARCHAR(50),
     UNIQUE (floor_plan, user_name, survey_name)
 );
 
 CREATE TABLE measurements (
-    id             serial PRIMARY KEY,
-    coordinate     point CHECK (coordinate <@ box '((0,0),(1,1))'),
-    log_time       timestamp DEFAULT now(),
-    survey_context int REFERENCES survey_contexts,
-    ap_info        int REFERENCES access_points,
-    readings       real []
+    id             SERIAL PRIMARY KEY,
+    coordinate     POINT CHECK (coordinate <@ BOX '((0,0),(1,1))'),
+    log_time       TIMESTAMP DEFAULT now(),
+    survey_context INT REFERENCES survey_contexts,
+    ap_info        INT REFERENCES access_points,
+    readings       REAL []
 );
 
 CREATE INDEX ON measurements (survey_context);
@@ -35,14 +35,17 @@ CREATE VIEW survey_data AS
 
 
 CREATE OR REPLACE FUNCTION survey_data_insert_row()
-    RETURNS trigger AS
+    RETURNS TRIGGER AS
 $$
 DECLARE
-    ap_id      int;
-    context_id int;
+    ap_id      INT;
+    context_id INT;
 BEGIN
     --Notice: functions run in a transaction so there is no need for a transaction here!
-    SELECT id INTO ap_id FROM access_points WHERE NEW.mac = mac;
+    SELECT id
+    INTO ap_id
+    FROM access_points
+    WHERE NEW.mac = mac;
     IF NOT FOUND
     THEN
         INSERT INTO access_points (mac, channel, ssid)
@@ -50,7 +53,8 @@ BEGIN
         RETURNING id INTO ap_id;
     END IF;
 
-    SELECT id INTO context_id
+    SELECT id
+    INTO context_id
     FROM survey_contexts
     WHERE floor_plan = NEW.floor_plan AND user_name = NEW.user_name AND survey_name = NEW.survey_name;
     IF NOT FOUND
@@ -68,10 +72,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION survey_data_delete_row()
-    RETURNS trigger AS
+    RETURNS TRIGGER AS
 $$
 BEGIN
-    DELETE FROM measurements WHERE OLD.id = measurements.id;
+    DELETE FROM measurements
+    WHERE OLD.id = measurements.id;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -91,5 +96,7 @@ VALUES (point(0.12, 0.15), '2017-03-12 13:56:42.75', 'floor-8', 'group-2', 'exp#
         'CE_WLAN', '{-25.5}');
 
 
-SELECT * FROM survey_data WHERE coordinate <-> POINT(0.22130,0.1378881) <= 0.0001
+SELECT *
+FROM survey_data
+WHERE coordinate <-> POINT(0.22130, 0.1378881) <= 0.0001
 

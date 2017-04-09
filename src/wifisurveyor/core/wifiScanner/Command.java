@@ -7,27 +7,43 @@ import java.io.InputStreamReader;
 /**
  * Created by hamid on 3/6/2017.
  */
-public class Command {
-    public static String execute (String command){
-        try {
-            String ssid;
+public class Command
+{
+    public static String executeString  ommand)
+
+
+
+        try
+        {
             StringBuilder stringBuilder = new StringBuilder();
-            ProcessBuilder builder = new ProcessBuilder(
-                    "cmd.exe", "/c", command);
+
+            r builder = ne  Proces B ild r("cmd.exe", "/c", command);
             builder.redirectErrorStream(true);
             Process p = builder.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
-            while ((line = r.readLine()) != null) {
+
+            ine =  .read
+            ll)
+            {
                 stringBuilder.append(line);
                 stringBuilder.append("\n");
             }
             return stringBuilder.toString();
-        } catch (IOException e) {
+        }
+        cat
+        e
+        tion  )
+        {
             return null;
         }
     }
-    public static String mock(){
+
+
+
+    c stat c Stri g mock )
+
+    {
         return "Wireless System Information Summary\n" +
                 "(Time: 3/6/2017 9:33:05 AM Iran Standard Time)\n" +
                 "\n" +
