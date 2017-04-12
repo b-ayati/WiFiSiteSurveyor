@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class SurveyingDialog extends JDialog
 {
-    public static final double SCREEN_FILL = 0.9;
+    public static final double SCREEN_FILL = 0.85;
     private JPanel contentPane;
     private JButton closeButton;
     private ImprintableImage imprintableImg;
@@ -26,10 +26,18 @@ public class SurveyingDialog extends JDialog
 
     private void createUIComponents()
     {
-        imprintableImg = new ImprintableImage(
-                new ImprintableImage.Configuration(),
-                new FloorPlanSurveyor(),
-                Manager.getSurveyor().getCurrentFloorPlanImg());
+        try
+        {
+            imprintableImg = new ImprintableImage(
+                    this,
+                    new ImprintableImage.Configuration(),
+                    new FloorPlanSurveyor(this),
+                    Manager.getSurveyor().getCurrentFloorPlanImg());
+        }
+        catch (Exception e)
+        {
+            Manager.getUI().showGeneralErrorMessage(e);
+        }
     }
 
     public void showStatus(String status)

@@ -71,7 +71,8 @@ public class DBManager
     public Point2D[] getPoints(String floor_plan, String username, String survey_name) throws SQLException
     {
 
-        String query = String.format("SELECT coordinate from survey_data WHERE floor_plan = '%s' and user_name = '%s' and survey_name='%s';", floor_plan, username, survey_name);
+        String query = String.format("SELECT DISTINCT (coordinate[0], coordinate[1]) from survey_data WHERE floor_plan = '%s' and user_name = '%s' and survey_name='%s';", floor_plan, username, survey_name);
+        System.out.println(query);
         ResultSet resultSet = stmt.executeQuery(query);
         ArrayList<Point2D> point2DS = new ArrayList<>();
         while (resultSet.next())
@@ -80,14 +81,7 @@ public class DBManager
             String pointString = tmp.substring(1, tmp.length() - 1);
             String[] parts = pointString.split(",");
             Point2D p = new Point2D.Float(Float.parseFloat(parts[0]), Float.parseFloat(parts[1]));
-            if (point2DS.size() == 0)
-                point2DS.add(p);
-            else
-            {
-                Point2D last = point2DS.get(point2DS.size() - 1);
-                if (p.getX() != last.getX() || p.getY() != last.getY())
-                    point2DS.add(p);
-            }
+            point2DS.add(p);
         }
         return point2DS.toArray(new Point2D[point2DS.size()]);
     }
@@ -109,7 +103,8 @@ public class DBManager
     public String[][] getPointData(Point2D coordinate, String plan, String username, String survey_name) throws SQLException
     {
 
-        String query = String.format("SELECT mac,channel,ssid,avg(readings[1]) as signal_power FROM survey_data WHERE coordinate <-> point(%f,%f) <= " + PRECISION + " and floor_plan = '%s' and survey_name='%s' and user_name='%s' GROUP BY mac,user_name,survey_name,floor_plan, ssid, channel ORDER BY signal_power DESC;", coordinate.getX(), coordinate.getY(), plan, survey_name, username);
+        String query = String.format("SELECT mac, channel, ssid, avg(readings[1]) as signal_power FROM survey_data WHERE floor_plan = '%s' and survey_name= '%s' and user_name='%s' and coordinate <-> point(%f,%f) <= " + PRECISION + " GROUP BY mac, channel, ssid ORDER BY signal_power DESC;", plan, survey_name, username,  coordinate.getX(), coordinate.getY());
+        System.out.println(query);
         ResultSet resultSet = stmt.executeQuery(query);
         ArrayList<String[]> data = new ArrayList<>();
         while (resultSet.next())

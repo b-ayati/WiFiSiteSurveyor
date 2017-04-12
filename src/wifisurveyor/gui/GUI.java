@@ -13,7 +13,8 @@ public class GUI implements UI
 
     public synchronized void reportStatus(String status)
     {
-        currSurveyingDialog.showStatus(status);
+        if(currSurveyingDialog != null)
+            currSurveyingDialog.showStatus(status);
     }
 
     void setCurrSurveyingDialog(SurveyingDialog currSurveyingDialog)
@@ -26,7 +27,7 @@ public class GUI implements UI
     {
         if (currSurveyingDialog != null)
             reportStatus("Error!!!");
-        JOptionPane.showMessageDialog(currSurveyingDialog, "This operation can't be done. the following error has occurred:\n" + e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(currSurveyingDialog, "This operation couldn't be completed. the following error has occurred:\n" + e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
         e.printStackTrace();
     }
 

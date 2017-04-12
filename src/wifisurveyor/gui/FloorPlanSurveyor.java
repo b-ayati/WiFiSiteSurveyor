@@ -4,6 +4,7 @@ import wifisurveyor.Manager;
 import wifisurveyor.PlainTextTable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
@@ -12,10 +13,9 @@ import java.awt.geom.Point2D;
 
 public class FloorPlanSurveyor implements ImprintableImage.Handler
 {
-    private ImprintableImage parent;
+    private Component parent;
 
-    @Override
-    public void setParent(ImprintableImage parent)
+    public FloorPlanSurveyor(Component parent)
     {
         this.parent = parent;
     }
@@ -30,6 +30,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         }
         catch (Exception e)
         {
+            parent.setEnabled(true); //to prevent parent dialog from minimizing
             Manager.getUI().showGeneralErrorMessage(e);
             return false;
         }
@@ -40,6 +41,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
     {
         try
         {
+            parent.setEnabled(true);
             int option = JOptionPane.showOptionDialog(
                     parent,
                     "Are you sure you want to permanently delete this point and its data?",

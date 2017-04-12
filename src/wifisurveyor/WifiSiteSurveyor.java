@@ -10,7 +10,7 @@ public interface WifiSiteSurveyor
 {
     public void setContext(String floorPlan, String surveyName);
 
-    public Image getCurrentFloorPlanImg();
+    public Image getCurrentFloorPlanImg() throws Exception;
 
     public String[] getFloorPlanNames();
 

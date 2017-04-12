@@ -28,6 +28,7 @@ public class Main
         catch (SQLException e)
         {
             ui.showConnectionErrorMessage(e);
+            System.exit(1);
         }
     }
 }

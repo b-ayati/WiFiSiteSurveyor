@@ -10,7 +10,7 @@ import javax.swing.*;
  */
 public class StartingForm
 {
-    JPanel rootPanel;
+    private JPanel rootPanel;
     private JButton okButton;
     private JComboBox planComboBox;
     private JComboBox prjNameComboBox;
@@ -25,13 +25,12 @@ public class StartingForm
     {
         String floor_plan = (String) planComboBox.getSelectedItem();
         String prj = (String) prjNameComboBox.getSelectedItem();
-        if (prj.equals(""))
+        if (prj == null || prj.equals(""))
             JOptionPane.showMessageDialog(null, "please enter a valid name for your project.");
         else
         {
             Manager.getSurveyor().setContext(floor_plan, prj);
             SurveyingDialog dialog = new SurveyingDialog();
-
             dialog.pack();
             dialog.setTitle(prj + ": " + floor_plan);
             dialog.setLocationRelativeTo(null);

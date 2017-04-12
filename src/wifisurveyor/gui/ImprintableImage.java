@@ -16,10 +16,135 @@ import static javax.swing.SwingUtilities.isRightMouseButton;
  */
 public class ImprintableImage extends JComponent implements MouseListener
 {
+    private Configuration config;
+    private Handler handler;
+    private Image backgroundImage;
+    private List<ImprintableImage.Point> markedPoints = new ArrayList<>();
+    private Component parent;
+
+    public ImprintableImage(Component parent, Configuration config, Handler handler, Image backgroundImage)
+    {
+        this.parent = parent;
+        this.handler = handler;
+        this.backgroundImage = backgroundImage;
+        addMouseListener(this);
+        this.config = config;
+        Point2D[] initialPoints = handler.getInitialPoints();
+        for (Point2D initPt : initialPoints)
+        {
+            Point tempPt = new Point((float) initPt.getX(), (float) initPt.getY());
+            tempPt.setIcon(config.pointAddedIcon);
+            this.markedPoints.add(tempPt);
+        }
+        this.setPreferredSize(new Dimension(backgroundImage.getWidth(this), backgroundImage.getHeight(this)));
+        this.setMaximumSize(this.getPreferredSize());
+    }
+
+
+    @Override
+    public synchronized boolean isEnabled()         //we need a synchronized version of this function
+    {
+        return super.isEnabled();
+    }
+
+    @Override
+    public synchronized void setEnabled(boolean enabled)    //we need a synchronized version of this function
+    {
+        super.setEnabled(enabled);
+    }
+
+    @Override
+    public void paint(Graphics g)
+    {
+        super.paint(g);
+        g.drawImage(backgroundImage, 0, 0, this);
+        for (Point marked_point : markedPoints)
+            marked_point.paint(this, g);
+    }
+
+    @Override
+    public synchronized void mouseClicked(MouseEvent e)
+    {
+        ImprintableImage.Point p = new ImprintableImage.Point(e.getX(), e.getY());
+        if (this.isEnabled() && p.isInside())
+        {
+            this.setEnabled(false);
+            int index = markedPoints.lastIndexOf(p);
+            if (index == -1)
+            {
+                if (isLeftMouseButton(e))
+                {
+                    parent.setEnabled(false);
+                    markedPoints.add(p);
+                    p.setIcon(config.pointSavingIcon);
+                    new Thread(() ->
+                    {
+                        if (handler.addPoint(p.normalizedPoint))
+                            p.setIcon(config.pointAddedIcon);
+                        else
+                            markedPoints.remove(markedPoints.size() - 1);
+                        parent.setEnabled(true);
+                        this.setEnabled(true);
+                    }).start();
+                }
+                else
+                    this.setEnabled(true);
+            }
+            else
+            {
+                Point selected = markedPoints.get(index);
+                if (isRightMouseButton(e))
+                {
+                    selected.setIcon(config.pointRemovingIcon);
+                    new Thread(() ->
+                    {
+                        if (handler.removePoint(selected.normalizedPoint))
+                            markedPoints.remove(index);
+                        else
+                            selected.setIcon(config.pointAddedIcon);
+                        this.setEnabled(true);
+                    }).start();
+                }
+                else
+                {
+                    selected.setIcon(config.pointSelectedIcon);
+                    new Thread(() ->
+                    {
+                        handler.selectPoint(selected.normalizedPoint);
+                        selected.setIcon(config.pointAddedIcon);
+                        this.setEnabled(true);
+                    }).start();
+                }
+            }
+            repaint();
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e)
+    {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e)
+    {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e)
+    {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e)
+    {
+
+    }
+
     public interface Handler
     {
-        void setParent(ImprintableImage parent);
-
         boolean addPoint(Point2D p);
 
         boolean removePoint(Point2D p);
@@ -91,118 +216,6 @@ public class ImprintableImage extends JComponent implements MouseListener
         {
             icon.paintIcon(observer, g, this.x - icon.getIconWidth() / 2, this.y - icon.getIconHeight() / 2);
         }
-    }
-
-    private Configuration config;
-    private Handler handler;
-    private Image backgroundImage;
-    private List<ImprintableImage.Point> markedPoints = new ArrayList<>();
-    private boolean isReady = true;
-
-    public ImprintableImage(Configuration config, Handler handler, Image backgroundImage)
-    {
-        this.handler = handler;
-        handler.setParent(this);
-        this.backgroundImage = backgroundImage;
-        addMouseListener(this);
-        this.config = config;
-        Point2D[] initialPoints = handler.getInitialPoints();
-        for (Point2D initPt : initialPoints)
-        {
-            Point tempPt = new Point((float) initPt.getX(), (float) initPt.getY());
-            tempPt.setIcon(config.pointAddedIcon);
-            this.markedPoints.add(tempPt);
-        }
-        this.setPreferredSize(new Dimension(backgroundImage.getWidth(this), backgroundImage.getHeight(this)));
-        this.setMaximumSize(this.getPreferredSize());
-    }
-
-    @Override
-    public void paint(Graphics g)
-    {
-        super.paint(g);
-        g.drawImage(backgroundImage, 0, 0, this);
-        for (Point marked_point : markedPoints)
-            marked_point.paint(this, g);
-    }
-
-    @Override
-    public synchronized void mouseClicked(MouseEvent e)
-    {
-        ImprintableImage.Point p = new ImprintableImage.Point(e.getX(), e.getY());
-        if (isReady && p.isInside())
-        {
-            isReady = false;
-            int index = markedPoints.lastIndexOf(p);
-            if (index == -1)
-            {
-                if (isLeftMouseButton(e))
-                {
-                    markedPoints.add(p);
-                    p.setIcon(config.pointSavingIcon);
-                    new Thread(() ->
-                    {
-                        if (handler.addPoint(p.normalizedPoint))
-                            p.setIcon(config.pointAddedIcon);
-                        else
-                            markedPoints.remove(markedPoints.size() - 1);
-                        isReady = true;
-                    }).start();
-                }
-                else
-                    isReady = true;
-            }
-            else
-            {
-                Point selected = markedPoints.get(index);
-                if (isRightMouseButton(e))
-                {
-                    selected.setIcon(config.pointRemovingIcon);
-                    new Thread(() ->
-                    {
-                        if (handler.removePoint(selected.normalizedPoint))
-                            markedPoints.remove(index);
-                        else
-                            selected.setIcon(config.pointAddedIcon);
-                        isReady = true;
-                    }).start();
-                }
-                else
-                {
-                    selected.setIcon(config.pointSelectedIcon);
-                    new Thread(() ->
-                    {
-                        handler.selectPoint(selected.normalizedPoint);
-                        selected.setIcon(config.pointAddedIcon);
-                        isReady = true;
-                    }).start();
-                }
-            }
-            repaint();
-        }
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e)
-    {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e)
-    {
-
     }
 
 
