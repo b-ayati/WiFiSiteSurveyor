@@ -3,6 +3,7 @@ package wifisurveyor.core.Database;
 import java.awt.geom.Point2D;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * Created by alireza on 3/15/17.
@@ -10,7 +11,8 @@ import java.util.ArrayList;
 public class DBManager
 {
     public static final double PRECISION = 0.0001;
-    private Connection c = null;
+    public static final int TIMEOUT_SECS = 8;
+    private Connection connection = null;
     private Statement stmt = null;
     private String user = "survey_app";
     private String password = "surveyMIGirim10";
@@ -25,9 +27,16 @@ public class DBManager
     {
         System.out.println("connecting to database ....");
         Class.forName("org.postgresql.Driver");
-        this.c = DriverManager.getConnection("jdbc:postgresql://git.ce.sharif.edu:5432/site_survey_db", user, password);
-        this.c.setAutoCommit(false);
-        this.stmt = c.createStatement();
+        Properties props = new Properties();
+        props.setProperty("user", user);
+        props.setProperty("password", password);
+        props.setProperty("loginTimeout" , String.valueOf(TIMEOUT_SECS));
+        props.setProperty("connectTimeout", String.valueOf(TIMEOUT_SECS));
+        props.setProperty("socketTimeout", String.valueOf(TIMEOUT_SECS));
+        this.connection = DriverManager.getConnection("jdbc:postgresql://git.ce.sharif.edu:5432/site_survey_db", props);
+        this.connection.setAutoCommit(true);
+        this.stmt = connection.createStatement();
+        this.stmt.setQueryTimeout(TIMEOUT_SECS);
         System.out.println("finished ....");
     }
 
@@ -48,8 +57,7 @@ public class DBManager
     public void insert(Point2D coordinate, String log_time, String plan, String user_name, String survey_name, String mac, int channel, String ssid, String signalPower) throws SQLException
     {
         String query = String.format("INSERT INTO survey_data (coordinate, log_time, floor_plan, user_name, survey_name, mac, channel, ssid, readings) VALUES (%s, '%s', '%s', '%s', '%s', macaddr('%s'), %d, '%s', '{%s}');", "point(" + coordinate.getX() + "," + coordinate.getY() + ")", log_time, plan, user_name, survey_name, mac, channel, ssid.replace("'", ""), signalPower);
-        stmt.execute(query);
-        c.commit();
+        stmt.executeUpdate(query);
     }
 
     /**
@@ -64,8 +72,7 @@ public class DBManager
     {
         String query = String.format("delete FROM survey_data WHERE coordinate <-> point(%f,%f) <= " + PRECISION + " and floor_plan = '%s' and survey_name='%s' and user_name='%s';", coordinate.getX(), coordinate.getY(), plan, survey_name, username);
         System.out.println(query);
-        stmt.execute(query);
-        c.commit();
+        stmt.executeUpdate(query);
     }
 
     public Point2D[] getPoints(String floor_plan, String username, String survey_name) throws SQLException

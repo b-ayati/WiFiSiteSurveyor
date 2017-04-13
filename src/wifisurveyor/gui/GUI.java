@@ -1,6 +1,7 @@
 package wifisurveyor.gui;
 
 import wifisurveyor.UI;
+import wifisurveyor.WifiSiteSurveyor;
 
 import javax.swing.*;
 
@@ -9,8 +10,19 @@ import javax.swing.*;
  */
 public class GUI implements UI
 {
+    private WifiSiteSurveyor surveyor;
     private SurveyingDialog currSurveyingDialog = null;
 
+    private GUI() throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException
+    {
+        // Set cross-platform Java L&F (also called "Metal")
+        //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+
+        //Set System L&F
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    }
+
+    @Override
     public synchronized void reportStatus(String status)
     {
         if(currSurveyingDialog != null)
@@ -34,7 +46,7 @@ public class GUI implements UI
     @Override
     public void showConnectionErrorMessage(Exception e)
     {
-        JOptionPane.showMessageDialog(currSurveyingDialog, e.getMessage() + "\ncheck your network connection and make sure you can ping ce.sharif.edu.", "Connection Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(currSurveyingDialog, e.getMessage() + "\nCheck your network connection and make sure you can ping ce.sharif.edu.", "Connection Error", JOptionPane.ERROR_MESSAGE);
         e.printStackTrace();
     }
 
@@ -51,6 +63,32 @@ public class GUI implements UI
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(StartingForm::createAndShow);
     }
+
+    public void registerWiFiSurveyor(WifiSiteSurveyor surveyor)
+    {
+        this.surveyor = surveyor;
+    }
+
+    public WifiSiteSurveyor getWiFiSurveyor()
+    {
+        return surveyor;
+    }
+
+//singleton methods
+    private static GUI instance = null;
+
+    public static void initialize() throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException
+    {
+        if(instance != null)
+            throw new IllegalStateException();
+        instance = new GUI();
+    }
+
+    public static GUI getInstance()
+    {
+        return instance;
+    }
+
 
 
 }

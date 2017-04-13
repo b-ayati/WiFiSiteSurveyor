@@ -17,4 +17,10 @@ public class AP
     public String channel;
     public String mac;
     public float power;
+
+    @Override
+    public String toString()
+    {
+        return "[" + mac + "||" + ssid + "||" + channel + "||" + power + "]";
+    }
 }

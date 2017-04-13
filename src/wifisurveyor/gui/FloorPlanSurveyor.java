@@ -1,6 +1,5 @@
 package wifisurveyor.gui;
 
-import wifisurveyor.Manager;
 import wifisurveyor.PlainTextTable;
 
 import javax.swing.*;
@@ -25,13 +24,13 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
     {
         try
         {
-            Manager.getSurveyor().scan(p);
+            GUI.getInstance().getWiFiSurveyor().scan(p);
             return true;
         }
         catch (Exception e)
         {
             parent.setEnabled(true); //to prevent parent dialog from minimizing
-            Manager.getUI().showGeneralErrorMessage(e);
+            GUI.getInstance().showGeneralErrorMessage(e);
             return false;
         }
     }
@@ -53,7 +52,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
                     null);
             if (option == JOptionPane.YES_OPTION)
             {
-                Manager.getSurveyor().remove(p);
+                GUI.getInstance().getWiFiSurveyor().remove(p);
                 return true;
             }
             else
@@ -61,7 +60,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         }
         catch (Exception e)
         {
-            Manager.getUI().showGeneralErrorMessage(e);
+            GUI.getInstance().showGeneralErrorMessage(e);
             return false;
         }
     }
@@ -71,7 +70,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
     {
         try
         {
-            PlainTextTable textTable = Manager.getSurveyor().getData(p);
+            PlainTextTable textTable = GUI.getInstance().getWiFiSurveyor().getData(p);
             JTable table = new JTable(textTable.getData(), textTable.getColumnNames());
             table.setEnabled(false);
             JScrollPane scrollPane = new JScrollPane(table);
@@ -81,7 +80,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         }
         catch (Exception e)
         {
-            Manager.getUI().showGeneralErrorMessage(e);
+            GUI.getInstance().showGeneralErrorMessage(e);
             return false;
         }
     }
@@ -91,11 +90,11 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
     {
         try
         {
-            return Manager.getSurveyor().getCurrentPoints();
+            return GUI.getInstance().getWiFiSurveyor().getCurrentPoints();
         }
         catch (Exception e)
         {
-            Manager.getUI().showGeneralErrorMessage(e);
+            GUI.getInstance().showGeneralErrorMessage(e);
             return null;
         }
     }

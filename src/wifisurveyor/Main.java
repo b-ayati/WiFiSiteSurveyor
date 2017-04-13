@@ -13,16 +13,13 @@ public class Main
 {
     public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException
     {
-        // Set cross-platform Java L&F (also called "Metal")
-        //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-
-        //Set System L&F
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        GUI ui = new GUI();
+        GUI.initialize();
+        GUI ui = GUI.getInstance();
         try
         {
-            DirectDbSiteSurveyor surveyor = new DirectDbSiteSurveyor();
-            Manager.initialize(surveyor, ui);
+            DirectDbSiteSurveyor.initialize();
+            ui.registerWiFiSurveyor(DirectDbSiteSurveyor.getInstance());
+            DirectDbSiteSurveyor.getInstance().registerUi(ui);
             ui.showMainForm();
         }
         catch (SQLException e)

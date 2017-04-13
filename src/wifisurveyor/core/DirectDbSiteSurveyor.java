@@ -1,7 +1,7 @@
 package wifisurveyor.core;
 
-import wifisurveyor.Manager;
 import wifisurveyor.PlainTextTable;
+import wifisurveyor.UI;
 import wifisurveyor.WifiSiteSurveyor;
 import wifisurveyor.core.Database.DBManager;
 import wifisurveyor.core.wifiScanner.AP;
@@ -23,18 +23,20 @@ import java.util.Date;
 public class DirectDbSiteSurveyor implements WifiSiteSurveyor
 {
     //constants:
-    private static final int SCAN_COUNT = 3;
+    private static final int SCAN_COUNT = 4;
     private static final String WIFI_PROFILE_NAME = "CE_WLAN";
-    private static final int RETRY_COUNT = 3;
-    private static final int RESTART_DELAY_SECS = 5;
+    private static final int RETRY_COUNT = 4;
+    private static final int RESTART_DELAY_SECS = 4;
+    private static final int WIFI_RECONNECT_DELAY_SECS = 4;
 
     //private String user;
     //private String password;
+    private UI ui;
     private final String[] floorPlans = new String[]{"floor-03"};
     private String currentFloorPlan = null;
     private String currentSurveyName = null;
     private DBManager manager = null;
-    private String userName = "test";
+    private String userName = "test2";
 
     /*
         public DirectDbSiteSurveyor(String user, String password)
@@ -43,7 +45,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
             this.password = password;
         }
     */
-    public DirectDbSiteSurveyor() throws SQLException, ClassNotFoundException
+    private DirectDbSiteSurveyor() throws SQLException, ClassNotFoundException
     {
         this.manager = new DBManager();
     }
@@ -54,7 +56,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
         {
             try
             {
-                Manager.getUI().reportStatus("Reconnecting to database(attempt #" + tries + ")...");
+                DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Reconnecting to database (attempt #" + tries + ")...");
                 Thread.sleep(RESTART_DELAY_SECS * 1000);
                 this.manager = new DBManager();
                 break;
@@ -102,9 +104,17 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     }
 
     @Override
-    public Point2D[] getCurrentPoints() throws SQLException
+    public Point2D[] getCurrentPoints() throws SQLException, InterruptedException, ClassNotFoundException
     {
-        return manager.getPoints(this.currentFloorPlan, this.userName, this.currentSurveyName);
+        try
+        {
+            return manager.getPoints(this.currentFloorPlan, this.userName, this.currentSurveyName);
+        }
+        catch (SQLException e)
+        {
+            this.restart();
+            throw e;
+        }
     }
 
     @Override
@@ -115,29 +125,30 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
             for (int k = 1; k <= SCAN_COUNT; k++)
             {
                 //String commandOutput = Command.mock();
-                Manager.getUI().reportStatus("Refreshing wifi interface...");
+                DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Refreshing wifi interface...");
                 System.out.println(Command.execute("netsh wlan disconnect"));
-                Thread.sleep(4000);
+                Thread.sleep(WIFI_RECONNECT_DELAY_SECS * 1000);
                 System.out.println(Command.execute("netsh wlan connect " + WIFI_PROFILE_NAME));
                 this.restart();
-                Manager.getUI().reportStatus("Gathering data for sample #" + k + "...");
+                DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Gathering data for sample #" + k + "...");
                 String commandOutput = Command.execute("netsh wlan show networks mode=bssid");
                 Parser parser = new Parser(commandOutput);
                 ArrayList<AP> aps = parser.getAPs();
+                System.out.println(aps);
                 int i = 0;
                 SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy
                 Date now = new Date();
                 String strDate = sdfDate.format(now);
-                Manager.getUI().reportStatus("Sending sample #" + k + " to database...");
+                DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Sending sample #" + k + " to database...");
                 for (AP ap : aps)
                 {
                     int completed = (int) ((float) i / aps.size() * 100);
                     manager.insert(currentLocation, strDate, this.currentFloorPlan, this.userName, currentSurveyName, ap.mac, Integer.parseInt(ap.channel.trim()), ap.ssid, Float.toString(ap.power));
-                    Manager.getUI().reportStatus("Sending sample #" + k + " to database..." + completed + "%");
+                    DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Sending sample #" + k + " to database... " + completed + "%");
                     i++;
                 }
             }
-            Manager.getUI().reportStatus(format("Scan completed successfully for location %p.", currentLocation));
+            DirectDbSiteSurveyor.getInstance().getUi().reportStatus(format("Scan completed successfully for location %p.", currentLocation));
         }
         catch (Exception e)
         {
@@ -152,9 +163,9 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     {
         try
         {
-            Manager.getUI().reportStatus("Removing point...");
+            DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Removing point...");
             manager.delete(location, this.currentFloorPlan, this.userName, this.currentSurveyName);
-            Manager.getUI().reportStatus(format("Point %p removed successfully.", location));
+            DirectDbSiteSurveyor.getInstance().getUi().reportStatus(format("Point %p removed successfully.", location));
         }
         catch (SQLException e)
         {
@@ -170,10 +181,10 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
         try
         {
             System.out.println(location.getX() + "-" + location.getY());
-            Manager.getUI().reportStatus("Reading data from database...");
+            DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Reading data from database...");
             String[][] data = manager.getPointData(location, this.currentFloorPlan, this.userName, this.currentSurveyName);
             String[] columns = {"mac", "channel", "ssid", "readings"};
-            Manager.getUI().reportStatus(format("Data for %p retrieved successfully.", location));
+            DirectDbSiteSurveyor.getInstance().getUi().reportStatus(format("Data for %p retrieved successfully.", location));
             return new PlainTextTable(columns, data);
         }
         catch (SQLException e)
@@ -183,6 +194,31 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
         }
     }
 
+    public UI getUi()
+    {
+        return ui;
+    }
+
+    public void registerUi(UI ui)
+    {
+        this.ui = ui;
+    }
+
+//singleton methods:
+
+    private static DirectDbSiteSurveyor instance;
+
+    public static void initialize() throws SQLException, ClassNotFoundException
+    {
+        if(instance != null)
+            throw new IllegalStateException();
+        instance = new DirectDbSiteSurveyor();
+    }
+
+    public static DirectDbSiteSurveyor getInstance()
+    {
+        return instance;
+    }
 
 
 

@@ -1,7 +1,5 @@
 package wifisurveyor.gui;
 
-import wifisurveyor.Manager;
-
 import javax.swing.*;
 
 
@@ -26,10 +24,10 @@ public class StartingForm
         String floor_plan = (String) planComboBox.getSelectedItem();
         String prj = (String) prjNameComboBox.getSelectedItem();
         if (prj == null || prj.equals(""))
-            JOptionPane.showMessageDialog(null, "please enter a valid name for your project.");
+            JOptionPane.showMessageDialog(null, "Please enter a valid name for your project.");
         else
         {
-            Manager.getSurveyor().setContext(floor_plan, prj);
+            GUI.getInstance().getWiFiSurveyor().setContext(floor_plan, prj);
             SurveyingDialog dialog = new SurveyingDialog();
             dialog.pack();
             dialog.setTitle(prj + ": " + floor_plan);
@@ -44,15 +42,15 @@ public class StartingForm
     {
         try
         {
-            planComboBox = new JComboBox(Manager.getSurveyor().getFloorPlanNames());
+            planComboBox = new JComboBox(GUI.getInstance().getWiFiSurveyor().getFloorPlanNames());
 
-            prjNameComboBox = new JComboBox(Manager.getSurveyor().getSurveyNames());
+            prjNameComboBox = new JComboBox(GUI.getInstance().getWiFiSurveyor().getSurveyNames());
             planComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
             prjNameComboBox.setPrototypeDisplayValue("aaaaaaaaaaaaaaaaa");
         }
         catch (Exception e)
         {
-            Manager.getUI().showFatalErrorMessage(e);
+            GUI.getInstance().showFatalErrorMessage(e);
         }
     }
 

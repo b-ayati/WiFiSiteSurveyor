@@ -1,13 +1,13 @@
 package wifisurveyor.gui;
 
-import wifisurveyor.Manager;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class SurveyingDialog extends JDialog
 {
-    public static final double SCREEN_FILL = 0.85;
+    public static final double SCREEN_FILL_HEIGHT = 0.9;
+    public static final double SCREEN_FILL_WIDTH = 0.7;
     private JPanel contentPane;
     private JButton closeButton;
     private ImprintableImage imprintableImg;
@@ -17,27 +17,20 @@ public class SurveyingDialog extends JDialog
     {
         setContentPane(contentPane);
         setModal(true);
-        int height = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight() * SCREEN_FILL, this.getPreferredSize().getHeight());
-        int width = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getWidth() * SCREEN_FILL, this.getPreferredSize().getWidth());
+        int height = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight() * SCREEN_FILL_HEIGHT, this.getPreferredSize().getHeight());
+        int width = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getWidth() * SCREEN_FILL_WIDTH, this.getPreferredSize().getWidth());
         setPreferredSize(new Dimension(width, height));
-        ((GUI) Manager.getUI()).setCurrSurveyingDialog(this);
+        GUI.getInstance().setCurrSurveyingDialog(this);
         closeButton.addActionListener(e -> dispose());
     }
 
-    private void createUIComponents()
+    private void createUIComponents() throws Exception
     {
-        try
-        {
-            imprintableImg = new ImprintableImage(
-                    this,
-                    new ImprintableImage.Configuration(),
-                    new FloorPlanSurveyor(this),
-                    Manager.getSurveyor().getCurrentFloorPlanImg());
-        }
-        catch (Exception e)
-        {
-            Manager.getUI().showGeneralErrorMessage(e);
-        }
+        imprintableImg = new ImprintableImage(
+                this,
+                new ImprintableImage.Configuration(),
+                new FloorPlanSurveyor(this),
+                GUI.getInstance().getWiFiSurveyor().getCurrentFloorPlanImg());
     }
 
     public void showStatus(String status)
