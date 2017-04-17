@@ -57,7 +57,7 @@ public class StartingForm
     public static void createAndShow()
     {
         //Create and set up the window.
-        JFrame main_frame = new JFrame("WiFi Site Surveyor (beta)");
+        JFrame main_frame = new JFrame("WiFi Site Surveyor");
         main_frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         main_frame.setContentPane(new StartingForm().rootPanel);
