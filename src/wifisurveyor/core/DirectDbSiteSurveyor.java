@@ -25,14 +25,14 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     //constants:
     private static final int SCAN_COUNT = 4;
     private static final int RETRY_COUNT = 4;
-    private static final int RESTART_DELAY_SECS = 4;
-    private static final int WIFI_RECONNECT_DELAY_SECS = 4;
+    private static final int RESTART_DELAY_SECS = 5;
+    private static final int WIFI_RECONNECT_DELAY_SECS = 5;
 
 
     //private String user;
     //private String password;
     private UI ui;
-    private final String[] floorPlans = new String[]{"floor-01", "floor-02", "floor-03", "floor-04", "floor-05", "floor-06", "floor-07", "floor-08"};
+    private final String[] floorPlans = new String[]{"floor-00", "floor-02", "floor-03", "floor-04", "floor-05", "floor-06", "floor-07", "floor-08"};
     private String currentFloorPlan = null;
     private String currentSurveyName = null;
     private DBManager manager = null;
@@ -149,7 +149,6 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
         catch (Exception e)
         {
             this.restart();
-            this.remove(currentLocation);
             throw e;
         }
     }

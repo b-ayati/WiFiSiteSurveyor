@@ -31,7 +31,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         {
             parent.setEnabled(true); //to prevent parent dialog from minimizing
             GUI.getInstance().showGeneralErrorMessage(e);
-            return false;
+            return !this.removePoint(p);
         }
     }
 

@@ -18,7 +18,7 @@ public class Main
     {
         GUI.initialize();
         GUI ui = GUI.getInstance();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("config.txt"))))
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("Dummy"))))
         {
             DirectDbSiteSurveyor.initialize(reader.readLine(), reader.readLine());
             ui.registerWiFiSurveyor(DirectDbSiteSurveyor.getInstance());

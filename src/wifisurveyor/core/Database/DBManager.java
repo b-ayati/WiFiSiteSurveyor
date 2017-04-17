@@ -10,12 +10,14 @@ import java.util.Properties;
  */
 public class DBManager
 {
-    public static final double PRECISION = 0.0001;
-    public static final int TIMEOUT_SECS = 8;
+    private static final double PRECISION = 0.0001;
+    private static final int CONNECT_TIMEOUT_SECS = 8;
+    private static final int SOCKET_TIMEOUT_SECS = 15;
     private Connection connection = null;
     private Statement stmt = null;
     private String user = "survey_app";
     private String password = "surveyMIGirim10";
+    Savepoint s;
 
     /**
      * creates a JDBC connection to database
@@ -30,13 +32,13 @@ public class DBManager
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
-        props.setProperty("loginTimeout" , String.valueOf(TIMEOUT_SECS));
-        props.setProperty("connectTimeout", String.valueOf(TIMEOUT_SECS));
-        props.setProperty("socketTimeout", String.valueOf(TIMEOUT_SECS));
+        props.setProperty("loginTimeout" , String.valueOf(CONNECT_TIMEOUT_SECS));
+        props.setProperty("connectTimeout", String.valueOf(CONNECT_TIMEOUT_SECS));
+        props.setProperty("socketTimeout", String.valueOf(SOCKET_TIMEOUT_SECS));
         this.connection = DriverManager.getConnection("jdbc:postgresql://git.ce.sharif.edu:5432/site_survey_db", props);
         this.connection.setAutoCommit(true);
         this.stmt = connection.createStatement();
-        this.stmt.setQueryTimeout(TIMEOUT_SECS);
+        this.stmt.setQueryTimeout(SOCKET_TIMEOUT_SECS);
         System.out.println("finished ....");
     }
 

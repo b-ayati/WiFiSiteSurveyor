@@ -64,7 +64,7 @@ BEGIN
     END IF;
 
     INSERT INTO measurements (coordinate, log_time, survey_context, ap_info, readings)
-    VALUES (NEW.coordinate, NEW.log_time, context_id, ap_id, NEW.readings);
+    VALUES (NEW.coordinate, now(), context_id, ap_id, NEW.readings);
 
     RETURN NEW;
 END;
