@@ -24,29 +24,25 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
 {
     //constants:
     private static final int SCAN_COUNT = 4;
-    private static final String WIFI_PROFILE_NAME = "CE_WLAN";
     private static final int RETRY_COUNT = 4;
     private static final int RESTART_DELAY_SECS = 4;
     private static final int WIFI_RECONNECT_DELAY_SECS = 4;
 
+
     //private String user;
     //private String password;
     private UI ui;
-    private final String[] floorPlans = new String[]{"floor-03"};
+    private final String[] floorPlans = new String[]{"floor-01", "floor-02", "floor-03", "floor-04", "floor-05", "floor-06", "floor-07", "floor-08"};
     private String currentFloorPlan = null;
     private String currentSurveyName = null;
     private DBManager manager = null;
-    private String userName = "test2";
+    private String userName;
+    private String wifiProfileName;
 
-    /*
-        public DirectDbSiteSurveyor(String user, String password)
-        {
-            this.user = user;
-            this.password = password;
-        }
-    */
-    private DirectDbSiteSurveyor() throws SQLException, ClassNotFoundException
+    public DirectDbSiteSurveyor(String userName, String wifiProfileName) throws SQLException, ClassNotFoundException
     {
+        this.userName = userName;
+        this.wifiProfileName = wifiProfileName;
         this.manager = new DBManager();
     }
 
@@ -88,7 +84,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     public Image getCurrentFloorPlanImg() throws IOException
     {
         System.out.println("resources/plans/" + currentFloorPlan + ".png");
-        return ImageIO.read(getClass().getResource("resources/plans/" + currentFloorPlan + ".png"));
+        return ImageIO.read(getClass().getResource("resources/floor_plans/" + currentFloorPlan + ".png"));
     }
 
     @Override
@@ -128,7 +124,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
                 DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Refreshing wifi interface...");
                 System.out.println(Command.execute("netsh wlan disconnect"));
                 Thread.sleep(WIFI_RECONNECT_DELAY_SECS * 1000);
-                System.out.println(Command.execute("netsh wlan connect " + WIFI_PROFILE_NAME));
+                System.out.println(Command.execute("netsh wlan connect " + wifiProfileName));
                 this.restart();
                 DirectDbSiteSurveyor.getInstance().getUi().reportStatus("Gathering data for sample #" + k + "...");
                 String commandOutput = Command.execute("netsh wlan show networks mode=bssid");
@@ -208,11 +204,11 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
 
     private static DirectDbSiteSurveyor instance;
 
-    public static void initialize() throws SQLException, ClassNotFoundException
+    public static void initialize(String userName, String wifiProfileName) throws SQLException, ClassNotFoundException
     {
         if(instance != null)
             throw new IllegalStateException();
-        instance = new DirectDbSiteSurveyor();
+        instance = new DirectDbSiteSurveyor(userName, wifiProfileName);
     }
 
     public static DirectDbSiteSurveyor getInstance()

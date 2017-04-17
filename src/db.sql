@@ -17,7 +17,6 @@ CREATE TABLE survey_contexts (
     UNIQUE (floor_plan, user_name, survey_name)
 );
 
-
 CREATE TABLE measurements (
     id             SERIAL PRIMARY KEY,
     coordinate     POINT CHECK (coordinate <@ BOX '((0,0),(1,1))'),
@@ -33,7 +32,6 @@ CREATE VIEW survey_data AS
     SELECT measurements.id, coordinate, log_time, floor_plan, user_name, survey_name, mac, channel, ssid, readings
     FROM measurements, survey_contexts, access_points
     WHERE measurements.survey_context = survey_contexts.id AND measurements.ap_info = access_points.id;
-
 
 CREATE OR REPLACE FUNCTION survey_data_insert_row()
     RETURNS TRIGGER AS
@@ -92,9 +90,8 @@ INSTEAD OF DELETE ON survey_data
 FOR EACH ROW
 EXECUTE PROCEDURE survey_data_delete_row();
 
-SELECT mac,channel,ssid,avg(readings[1]) as signal_power FROM survey_data WHERE floor_plan = 'floor-03' and survey_name= '456465' and user_name='test' and coordinate <-> point(0.270860,0.770714) <= 1.0E-4 GROUP BY mac, channel, ssid ORDER BY signal_power DESC;
-
 /*
+SELECT mac,channel,ssid,avg(readings[1]) as signal_power FROM survey_data WHERE floor_plan = 'floor-03' and survey_name= '456465' and user_name='test' and coordinate <-> point(0.270860,0.770714) <= 1.0E-4 GROUP BY mac, channel, ssid ORDER BY signal_power DESC;
 INSERT INTO survey_data (coordinate, log_time, floor_plan, user_name, survey_name, mac, channel, ssid, readings)
 VALUES (point(0.12, 0.15), '2017-03-12 13:56:42.75', 'floor-8', 'group-2', 'exp#1', macaddr('00-14-22-01-23-45'), 6,
         'CE_WLAN', '{-25.5}');

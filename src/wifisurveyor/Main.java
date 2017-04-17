@@ -4,6 +4,9 @@ import wifisurveyor.core.DirectDbSiteSurveyor;
 import wifisurveyor.gui.GUI;
 
 import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 
 /**
@@ -15,9 +18,9 @@ public class Main
     {
         GUI.initialize();
         GUI ui = GUI.getInstance();
-        try
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("config.txt"))))
         {
-            DirectDbSiteSurveyor.initialize();
+            DirectDbSiteSurveyor.initialize(reader.readLine(), reader.readLine());
             ui.registerWiFiSurveyor(DirectDbSiteSurveyor.getInstance());
             DirectDbSiteSurveyor.getInstance().registerUi(ui);
             ui.showMainForm();
@@ -25,6 +28,12 @@ public class Main
         catch (SQLException e)
         {
             ui.showConnectionErrorMessage(e);
+            System.exit(1);
+        }
+        catch (IOException e)
+        {
+            ui.showFatalErrorMessage(e);
+            e.printStackTrace();
             System.exit(1);
         }
     }
