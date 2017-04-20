@@ -23,6 +23,7 @@ public class Main
             DirectDbSiteSurveyor.initialize(reader.readLine(), reader.readLine());
             ui.registerWiFiSurveyor(DirectDbSiteSurveyor.getInstance());
             DirectDbSiteSurveyor.getInstance().registerUi(ui);
+            DirectDbSiteSurveyor.getInstance().connect();
             ui.showMainForm();
         }
         catch (SQLException e)

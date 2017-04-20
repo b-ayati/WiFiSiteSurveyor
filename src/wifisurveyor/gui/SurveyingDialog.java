@@ -3,8 +3,10 @@ package wifisurveyor.gui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
-public class SurveyingDialog extends JDialog
+public class SurveyingDialog extends JDialog implements WindowListener
 {
     public static final double SCREEN_FILL_HEIGHT = 0.9;
     public static final double SCREEN_FILL_WIDTH = 0.7;
@@ -21,7 +23,9 @@ public class SurveyingDialog extends JDialog
         int width = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getWidth() * SCREEN_FILL_WIDTH, this.getPreferredSize().getWidth());
         setPreferredSize(new Dimension(width, height));
         GUI.getInstance().setCurrSurveyingDialog(this);
-        closeButton.addActionListener(e -> dispose());
+        addWindowListener(this);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        closeButton.addActionListener(e -> windowClosing(null));
     }
 
     private void createUIComponents() throws Exception
@@ -39,4 +43,61 @@ public class SurveyingDialog extends JDialog
         statusLabel.setText("• " + status);
     }
 
+    @Override
+    public void windowClosing(WindowEvent event)
+    {
+        new Thread(() ->
+        {
+            try
+            {
+                setEnabled(false);
+                GUI.getInstance().getWiFiSurveyor().closeCurrentContext();
+                dispose();
+            }
+            catch (Exception e)
+            {
+                setEnabled(true);
+                GUI.getInstance().showConnectionErrorMessage(e);
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+
+    @Override
+    public void windowOpened(WindowEvent e)
+    {
+
+    }
+
+
+    @Override
+    public void windowClosed(WindowEvent e)
+    {
+
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e)
+    {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e)
+    {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e)
+    {
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e)
+    {
+
+    }
 }

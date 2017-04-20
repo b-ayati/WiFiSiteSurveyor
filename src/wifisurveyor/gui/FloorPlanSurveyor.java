@@ -29,7 +29,6 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
         }
         catch (Exception e)
         {
-            parent.setEnabled(true); //to prevent parent dialog from minimizing
             GUI.getInstance().showGeneralErrorMessage(e);
             return !this.removePoint(p);
         }
@@ -40,16 +39,12 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
     {
         try
         {
-            parent.setEnabled(true);
-            int option = JOptionPane.showOptionDialog(
+            int option = GUI.showOptionDialog(
                     parent,
                     "Are you sure you want to permanently delete this point and its data?",
                     "Delete Point",
                     JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    null,
-                    null);
+                    JOptionPane.QUESTION_MESSAGE);
             if (option == JOptionPane.YES_OPTION)
             {
                 GUI.getInstance().getWiFiSurveyor().remove(p);
@@ -75,7 +70,7 @@ public class FloorPlanSurveyor implements ImprintableImage.Handler
             table.setEnabled(false);
             JScrollPane scrollPane = new JScrollPane(table);
             table.setFillsViewportHeight(true);
-            JOptionPane.showMessageDialog(parent, scrollPane, String.format("Data Collected at [%.3f,%.3f]", p.getX(), p.getY()), JOptionPane.PLAIN_MESSAGE);
+            GUI.showMessageDialog(parent, scrollPane, String.format("Data Collected at [%.3f,%.3f]", p.getX(), p.getY()), JOptionPane.PLAIN_MESSAGE);
             return true;
         }
         catch (Exception e)

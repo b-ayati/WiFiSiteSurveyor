@@ -51,6 +51,7 @@ public class ImprintableImage extends JComponent implements MouseListener
     public synchronized void setEnabled(boolean enabled)    //we need a synchronized version of this function
     {
         super.setEnabled(enabled);
+        parent.setEnabled(enabled);             //we will disable the whole window. remove this to keep window alive
     }
 
     @Override
@@ -74,7 +75,6 @@ public class ImprintableImage extends JComponent implements MouseListener
             {
                 if (isLeftMouseButton(e))
                 {
-                    parent.setEnabled(false);
                     markedPoints.add(p);
                     p.setIcon(config.pointSavingIcon);
                     new Thread(() ->
@@ -83,7 +83,6 @@ public class ImprintableImage extends JComponent implements MouseListener
                             p.setIcon(config.pointAddedIcon);
                         else
                             markedPoints.remove(markedPoints.size() - 1);
-                        parent.setEnabled(true);
                         this.setEnabled(true);
                     }).start();
                 }

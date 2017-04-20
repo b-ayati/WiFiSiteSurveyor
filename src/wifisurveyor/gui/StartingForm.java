@@ -30,7 +30,7 @@ public class StartingForm
             GUI.getInstance().getWiFiSurveyor().setContext(floor_plan, prj);
             SurveyingDialog dialog = new SurveyingDialog();
             dialog.pack();
-            dialog.setTitle(prj + ": " + floor_plan);
+            dialog.setTitle(GUI.getInstance().getWiFiSurveyor().getContext());
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
             if (prjNameComboBox.getSelectedIndex() == -1)        //an ugly way to keep the combo box updated!
