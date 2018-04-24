@@ -18,9 +18,9 @@ public class Main
     {
         GUI.initialize();
         GUI ui = GUI.getInstance();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("Dummy"))))
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("config"))))
         {
-            DirectDbSiteSurveyor.initialize(reader.readLine(), reader.readLine());
+            DirectDbSiteSurveyor.initialize(new DirectDbSiteSurveyor.Config(reader));
             ui.registerWiFiSurveyor(DirectDbSiteSurveyor.getInstance());
             DirectDbSiteSurveyor.getInstance().registerUi(ui);
             DirectDbSiteSurveyor.getInstance().connect();

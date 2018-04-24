@@ -11,6 +11,7 @@ import wifisurveyor.core.wifiScanner.Parser;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -22,6 +23,20 @@ import java.util.Date;
  */
 public class DirectDbSiteSurveyor implements WifiSiteSurveyor
 {
+    public static class Config
+    {
+        private final String[] FLOOR_PLANS = new String[]{"floor-00", "floor-01", "floor-02", "floor-03", "floor-04", "floor-05", "floor-06", "floor-07", "floor-08"};
+        private final String USER_NAME;
+        private final String WIFI_PROFILE_NAME;
+        private final DBManager.Config DBconfig;
+
+        public Config(BufferedReader configText) throws IOException
+        {
+            USER_NAME = configText.readLine();
+            WIFI_PROFILE_NAME = configText.readLine();
+            DBconfig = new DBManager.Config(configText);
+        }
+    }
     //constants:
     private static final int SCAN_COUNT = 4;
     private static final int RETRY_COUNT = 5;
@@ -32,18 +47,16 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     //private String user;
     //private String password;
     private UI ui;
-    private final String[] floorPlans = new String[]{"floor-00", "floor-01", "floor-02", "floor-03", "floor-04", "floor-05", "floor-06", "floor-07", "floor-08"};
+    private final Config config;
     private String currentFloorPlan = null;
     private String currentSurveyName = null;
     private DBManager manager = null;
-    private String userName;
-    private String wifiProfileName;
 
-    public DirectDbSiteSurveyor(String userName, String wifiProfileName) throws SQLException, ClassNotFoundException
+
+    public DirectDbSiteSurveyor(Config config) throws IOException, ClassNotFoundException
     {
-        this.userName = userName;
-        this.wifiProfileName = wifiProfileName;
-        this.manager = new DBManager();
+        this.config = config;
+        this.manager = new DBManager(config.DBconfig);
     }
 
     public void connect() throws SQLException
@@ -66,7 +79,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     @Override
     public String getContext()
     {
-        return String.format("[%s] - %s:%s", userName, currentSurveyName, currentFloorPlan);
+        return String.format("[%s] - %s:%s", config.USER_NAME, currentSurveyName, currentFloorPlan);
     }
 
     @Override
@@ -101,19 +114,19 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     @Override
     public String[] getFloorPlanNames()
     {
-        return floorPlans.clone();
+        return config.FLOOR_PLANS.clone();
     }
 
     @Override
     public String[] getSurveyNames() throws SQLException
     {
-        return manager.getUserProjects(userName);
+        return manager.getUserProjects(config.USER_NAME);
     }
 
     @Override
     public Point2D[] getCurrentPoints() throws SQLException, InterruptedException, ClassNotFoundException
     {
-        return manager.getPoints(this.currentFloorPlan, this.userName, this.currentSurveyName);
+        return manager.getPoints(this.currentFloorPlan, this.config.USER_NAME, this.currentSurveyName);
     }
 
     @Override
@@ -125,7 +138,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
             ui.reportStatus("Refreshing wifi interface...");
             System.out.println(Command.execute("netsh wlan disconnect"));
             Thread.sleep(WIFI_COOLDOWN_TIME_SECS * 1000);
-            System.out.println(Command.execute("netsh wlan connect " + wifiProfileName));
+            System.out.println(Command.execute("netsh wlan connect " + config.WIFI_PROFILE_NAME));
             ui.reportStatus("Gathering data for sample #" + k + "...");
             Thread.sleep(WIFI_COOLDOWN_TIME_SECS * 1000);
             String commandOutput = Command.execute("netsh wlan show networks mode=bssid");
@@ -136,7 +149,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
             Date now = new Date();
             String strDate = sdfDate.format(now);
             for (AP ap : aps)
-                manager.insert(currentLocation, strDate, this.currentFloorPlan, this.userName, currentSurveyName, ap.mac, Integer.parseInt(ap.channel.trim()), ap.ssid, Float.toString(ap.power));
+                manager.insert(currentLocation, strDate, this.currentFloorPlan, config.USER_NAME, currentSurveyName, ap.mac, Integer.parseInt(ap.channel.trim()), ap.ssid, ap.power);
         }
         ui.reportStatus(format("Scan completed successfully for location %p.", currentLocation));
     }
@@ -145,7 +158,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     public void remove(Point2D location) throws SQLException, ClassNotFoundException, InterruptedException
     {
         ui.reportStatus("Removing point...");
-        manager.delete(location, this.currentFloorPlan, this.userName, this.currentSurveyName);
+        manager.delete(location, this.currentFloorPlan, config.USER_NAME, this.currentSurveyName);
         ui.reportStatus(format("Point %p removed successfully.", location));
     }
 
@@ -155,7 +168,7 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
     {
         System.out.println(location.getX() + "-" + location.getY());
         ui.reportStatus("Reading data from database...");
-        String[][] data = manager.getPointData(location, this.currentFloorPlan, this.userName, this.currentSurveyName);
+        String[][] data = manager.getPointData(location, this.currentFloorPlan, config.USER_NAME, this.currentSurveyName);
         String[] columns = {"mac", "channel", "ssid", "readings"};
         ui.reportStatus(format("Data for %p retrieved successfully.", location));
         return new PlainTextTable(columns, data);
@@ -175,11 +188,11 @@ public class DirectDbSiteSurveyor implements WifiSiteSurveyor
 
     private static DirectDbSiteSurveyor instance;
 
-    public static void initialize(String userName, String wifiProfileName) throws SQLException, ClassNotFoundException
+    public static void initialize(Config config) throws SQLException, ClassNotFoundException, IOException
     {
         if (instance != null)
             throw new IllegalStateException();
-        instance = new DirectDbSiteSurveyor(userName, wifiProfileName);
+        instance = new DirectDbSiteSurveyor(config);
     }
 
     public static DirectDbSiteSurveyor getInstance()

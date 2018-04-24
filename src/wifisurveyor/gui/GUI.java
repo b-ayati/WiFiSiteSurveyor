@@ -47,7 +47,7 @@ public class GUI implements UI
     public void showConnectionErrorMessage(Exception e)
     {
         reportStatus("Connection Error!!! fix your network connection to prevent data loss.");
-        showMessageDialog(currSurveyingDialog, e.getMessage() + "\nCheck your network connection and make sure you can ping ce.sharif.edu.", "Connection Error", JOptionPane.ERROR_MESSAGE);
+        showMessageDialog(currSurveyingDialog, e.getMessage() + "\nCheck your network connection and make sure you can connect to your database.", "Connection Error", JOptionPane.ERROR_MESSAGE);
         e.printStackTrace();
     }
 
